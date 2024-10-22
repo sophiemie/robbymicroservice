@@ -7,8 +7,14 @@
 
 const express = require('express'); // Laedt das Express Framework
 const app = express(); // Erstellt eine Express Anwendung
+const robotRoutes = require('./routes/robot'); // Import der Roboter Routen
 
-console.log("Starting app.js");
+// Um JSON-Anfragen zu verarbeiten
+app.use(express.json()); 
+
+// Verwende die Roboter-Routen
+// /api = alle Routen von robot.js sind unter /api/ erreichbar z.B. GET /api/robot/:id/status
+app.use('/api', robotRoutes);
 
 // Route die auf / reagiert, also die Startseite localhost:port
 // (req, res) => { ... } wird aufgerufen wenn jemand eine GET-Anfrage an die Route schickt
