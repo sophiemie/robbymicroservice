@@ -13,11 +13,11 @@ const robotRoutes = require('./routes/robot'); // Import der Roboter Routen
 app.use(express.json()); 
 
 // Verwende die Roboter-Routen
-// /api = alle Routen von robot.js sind unter /api/ erreichbar z.B. GET /api/robot/:id/status
+// /robot = alle Routen von robot.js sind unter /robot/ erreichbar z.B. GET /robot/:id/status
 // (req, res) => { ... } wird aufgerufen wenn jemand eine GET-Anfrage an die Route schickt
 // req = Request, enthaelt alle Infos zur HTTP-Anfrage
 // res = Response, schickt Antwort an den Client zurueck
-app.use('/api', robotRoutes);
+app.use('/robot', robotRoutes);
 
 const port = 4000; // Port festlegen
 

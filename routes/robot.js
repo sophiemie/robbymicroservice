@@ -18,19 +18,19 @@ const {
 } = require('../controller/robotController');
 
 // API Endpunkte einmal aufgefuehrt und mit Controllerfunktion verknuepft
-router.get('/robot/:id/status', getStatus);
+router.get('/:id/status', getStatus);
 
-router.post('/robot/:id/move', move);
+router.post('/:id/move', move);
 
-router.post('/robot/:id/pickup/:itemId', pickUpItem);
+router.post('/:id/pickup/:itemId', pickUpItem);
 
-router.post('/robot/:id/putdown/:itemId', putDownItem);
+router.post('/:id/putdown/:itemId', putDownItem);
 
-router.patch('/robot/:id/state', updateStatus);
+router.patch('/:id/state', updateStatus);
 
-router.get('/robot/:id/actions', getActions);
+router.get('/:id/actions', getActions);
 
-router.post('/robot/:id/attack/:targetId', attackRobot);
+router.post('/:id/attack/:targetId', attackRobot);
 
 // Router Variable als public definieren
 module.exports = router;

@@ -16,7 +16,7 @@ const getStatus = (req, res) => {
     const robot = robots[req.params.id]; 
 
     if (robot)
-    {
+    {   
         res.json(robot); // Gibt JSON als Status zurueck, Response
     }
     else
