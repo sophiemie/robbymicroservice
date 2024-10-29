@@ -16,8 +16,17 @@ const getStatus = (req, res) => {
     const robot = robots[req.params.id]; 
 
     if (robot)
-    {   
-        res.json(robot); // Gibt JSON als Status zurueck, Response
+    {   // Gibt JSON als Status zurueck, Response
+        res.json({
+            ...robot,
+            _links: {
+                // Self = verweist auf den Status Endpunkt selber
+                // Actions = Ermoeglicht die Pagination
+                // Page und Size geben gewuenschte Seite und Anzahl der Ergebnisse pro Seite an
+                self: { href: '/robot/${req.params.id}/status' },
+                actions: { href: '/robot/${req.params.id}/actions?page=1&size=5' },
+            },
+        }); 
     }
     else
     {
