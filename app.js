@@ -14,15 +14,10 @@ app.use(express.json());
 
 // Verwende die Roboter-Routen
 // /api = alle Routen von robot.js sind unter /api/ erreichbar z.B. GET /api/robot/:id/status
-app.use('/api', robotRoutes);
-
-// Route die auf / reagiert, also die Startseite localhost:port
 // (req, res) => { ... } wird aufgerufen wenn jemand eine GET-Anfrage an die Route schickt
 // req = Request, enthaelt alle Infos zur HTTP-Anfrage
 // res = Response, schickt Antwort an den Client zurueck
-app.get('/', (req, res) => { 
-    res.send('Hello World!'); // Schickt den Text als Antwort an den Client
-});
+app.use('/api', robotRoutes);
 
 const port = 4000; // Port festlegen
 
