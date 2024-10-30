@@ -6,7 +6,15 @@
 
 // Ein Objekt, welche zwei Roboter mit ihren Eigenschaften speichern
 let robots = {
-    1: { id: 1, position: { x: 0, y: 0 }, energy: 100, inventory: [], actions: [] },
+    1: { id: 1, position: { x: 0, y: 0 }, energy: 100, inventory: [], actions: [
+        { type: "move", direction: "up", timestamp: Date.now() },
+        { type: "pickup", itemId: 123, timestamp: Date.now() },
+        { type: "move", direction: "up", timestamp: Date.now() },
+        { type: "pickup", itemId: 13, timestamp: Date.now() },
+        { type: "move", direction: "up", timestamp: Date.now() },
+        { type: "pickup", itemId: 3, timestamp: Date.now() },
+        { type: "move", direction: "up", timestamp: Date.now() },
+        { type: "pickup", itemId: 1, timestamp: Date.now() }, ],},
     2: { id: 2, position: { x: 5, y: 5 }, energy: 80, inventory: [], actions: [] }
 };
 
@@ -127,15 +135,41 @@ const updateStatus = (req, res) => {
 
 const getActions = (req, res) => {
     const robot = robots[req.params.id];
+    // Gewuenschte Seitenindex  vom Client
+    const page = parseInt(req.query.page) || 1; 
+    // Anzahl der Aktionen, falls kein Wert, wird es auf 5 gesetzt
+    const size = parseInt(req.query.size) || 5; 
+    // Gibt an bei welchem Element die Auflistung starten soll, bei Seite 2 z.B. Element 6
+    const startIndex = (page - 1) * size; 
+    // Bei welchem Element Auflistung enden soll
+    const endIndex = startIndex + size; 
+    // Liste der Aktionen die aufgefuehrt werden sollen
+    const paginatedActions = robot.actions.slice(startIndex, endIndex);
 
-    if (robot)
-    {
-        res.json(robot.actions); // Aktionen schicken
-    }
-    else
+    if (!robot)
     {
         res.status(404).send('Robot not found');
     }
+
+    res.json({
+        actions: paginatedActions, // Auflistung
+        page, // Welche Seite
+        size, // Wie viele Elemente
+        totalActions: robot.actions.length, // Anzahl gesamte Aktionen 
+        totalPages: Math.ceil(robot.actions.length / size), // Anzahl Gesamtseiten
+        _links: {
+            // Aktuelle Seite
+            self: { 
+                href: `/robot/${req.params.id}/actions?page=${page}&size=${size}` },
+            // Naechste Seite mit Ueberpruefung ob eine naechste Seite vorhanden ist
+            next: page * size < robot.actions.length ? { 
+                href: `/robot/${req.params.id}/actions?page=${page + 1}&size=${size}` } : null,
+            // Vorherige Seite, falls page groesser als 1 ist
+            previous: page > 1 ? { 
+                href: `/robot/${req.params.id}/actions?page=${page - 1}&size=${size}` } : null,
+        },
+    });
+
 };
 
 const attackRobot = (req, res) => {
