@@ -51,7 +51,7 @@ const move = (req, res) => {
         const direction = req.body.direction; // Mit Request aktuelle Ausrichtung anfragen
 
         if (direction === 'up') robot.position.y += 1;
-        else if (direction === 'up') robot.position.y -= 1;
+        else if (direction === 'down') robot.position.y -= 1;
         else if (direction === 'right') robot.position.x += 1;
         else if (direction === 'left') robot.position.x -= 1;
         else return res.status(400).send('Invalid direction');
@@ -173,22 +173,36 @@ const getActions = (req, res) => {
 };
 
 const attackRobot = (req, res) => {
-    const robot = robots[req.params.id];
-    const target = robots[req.params.targetID];
+    const attacker = robots[req.params.id];
+    const target = robots[req.params.targetId];
 
-    if (robot && target)
-    {
+    if (attacker && target) {
         const damage = 10;
+
+        // Hat der Angreifer genug Energie
+        if (attacker.energy < 5) 
+        {
+            return res.status(400).send('Insufficient energy to perform attack');
+        }
+
+        // Reduziere Energie des Angreifers um 5
         attacker.energy -= 5;
-        target.energy -= damage;
-        attacker.actions.push('Attacked robot ${target.id}');
-        res.json({ robot, target });
-    }
-    else
+        
+        // Schaden am Zielroboter
+        target.energy = Math.max(0, target.energy - damage); // Zielroboter kann nicht weniger als 0 Energie haben
+        
+        // Aktion zur Aktionsliste des Angreifers hinzufügen
+        attacker.actions.push(`Attacked robot ${target.id}`);
+        
+        // Antwort senden
+        res.json({ attacker, target });
+    } 
+    else 
     {
         res.status(404).send('Robot or Target not found');
     }
 };
+
 
 
 // Funktionen als public definieren
