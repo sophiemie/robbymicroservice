@@ -3,11 +3,13 @@
  * 
  */
 
-const express = require('express'); // Bindet Express-Framework ein
+//const express = require('express'); // Bindet Express-Framework ein
+
+import express from 'express'; // Importiert das Express-Framework
 const router = express.Router(); // Erstellt eine Router Instanz, die fuer die Definierung von Routen verwendet wird
 
 // Funktionen Importieren vom Controller
-const {
+import {
     getStatus,
     move,
     pickUpItem,
@@ -15,7 +17,7 @@ const {
     updateStatus,
     getActions,
     attackRobot
-} = require('../controller/robotController');
+} from '../controller/robotController.js';
 
 // API Endpunkte einmal aufgefuehrt und mit Controllerfunktion verknuepft
 router.get('/:id/status', getStatus);
@@ -32,5 +34,5 @@ router.get('/:id/actions', getActions);
 
 router.post('/:id/attack/:targetId', attackRobot);
 
-// Router Variable als public definieren
-module.exports = router;
+// Router-Variable als public definieren
+export default router;

@@ -5,9 +5,16 @@
  * 
  */
 
-const express = require('express'); // Laedt das Express Framework
+//const express = require('express'); // Laedt das Express Framework
+
+//const robotRoutes = require('./routes/robot'); // Import der Roboter Routen
+
+// Hauptprogramm vom Roboter - ES Modul Version
+import express from 'express'; // Importiert das Express-Framework
+import robotRoutes from './routes/robot.js'; // Importiert die Roboter-Routen
+
 const app = express(); // Erstellt eine Express Anwendung
-const robotRoutes = require('./routes/robot'); // Import der Roboter Routen
+
 
 // Um JSON-Anfragen zu verarbeiten
 app.use(express.json()); 
@@ -27,3 +34,7 @@ const port = 4000; // Port festlegen
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
+
+
+// Export nun hinzufuegen als ES Modul
+export default app;

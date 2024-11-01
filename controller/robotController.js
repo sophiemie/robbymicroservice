@@ -19,7 +19,7 @@ let robots = {
 };
 
 
-const getStatus = (req, res) => {
+export const getStatus = (req, res) => {
     // Sucht einen Roboter anhand der ID aus URL Parameter mit Request
     const robot = robots[req.params.id]; 
 
@@ -42,7 +42,7 @@ const getStatus = (req, res) => {
     }
 };
 
-const move = (req, res) => {
+export const move = (req, res) => {
     // Sucht einen Roboter anhand der ID aus URL Parameter mit Request
     const robot = robots[req.params.id]; 
 
@@ -66,7 +66,7 @@ const move = (req, res) => {
     }
 };
 
-const pickUpItem = (req, res) => {
+export const pickUpItem = (req, res) => {
     const robot = robots[req.params.id];
     const itemID = robots[req.params.itemID];
 
@@ -82,7 +82,7 @@ const pickUpItem = (req, res) => {
     }
 };
 
-const putDownItem = (req, res) => {
+export const putDownItem = (req, res) => {
     const robot = robots[req.params.id];
     const itemID = robots[req.params.itemID];
 
@@ -104,7 +104,7 @@ const putDownItem = (req, res) => {
     }
 };
 
-const updateStatus = (req, res) => {
+export const updateStatus = (req, res) => {
     const robot = robots[req.params.id];
 
     if (robot)
@@ -133,7 +133,7 @@ const updateStatus = (req, res) => {
     }
 };
 
-const getActions = (req, res) => {
+export const getActions = (req, res) => {
     const robot = robots[req.params.id];
     // Gewuenschte Seitenindex  vom Client
     const page = parseInt(req.query.page) || 1; 
@@ -172,7 +172,7 @@ const getActions = (req, res) => {
 
 };
 
-const attackRobot = (req, res) => {
+export const attackRobot = (req, res) => {
     const attacker = robots[req.params.id];
     const target = robots[req.params.targetId];
 
@@ -205,7 +205,7 @@ const attackRobot = (req, res) => {
 
 
 
-// Funktionen als public definieren
+/* Funktionen als public definieren
 module.exports = 
 {
     getStatus,
@@ -215,4 +215,4 @@ module.exports =
     updateStatus,
     getActions,
     attackRobot
-};
+}; */
