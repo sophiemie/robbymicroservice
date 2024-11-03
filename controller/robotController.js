@@ -6,7 +6,7 @@
 
 // Ein Objekt, welche zwei Roboter mit ihren Eigenschaften speichern
 let robots = {
-    1: { id: 1, position: { x: 0, y: 0 }, energy: 100, inventory: [], actions: [
+    1: { id: 1, position: { x: 0, y: 0 }, energy: 100, inventory: [1, 3, 13, 123], actions: [
         { type: "move", direction: "up", timestamp: Date.now() },
         { type: "pickup", itemId: 123, timestamp: Date.now() },
         { type: "move", direction: "up", timestamp: Date.now() },
@@ -15,7 +15,8 @@ let robots = {
         { type: "pickup", itemId: 3, timestamp: Date.now() },
         { type: "move", direction: "up", timestamp: Date.now() },
         { type: "pickup", itemId: 1, timestamp: Date.now() }, ],},
-    2: { id: 2, position: { x: 5, y: 5 }, energy: 80, inventory: [], actions: [] }
+    2: { id: 2, position: { x: 5, y: 5 }, energy: 80, inventory: [], actions: [
+        { type: "move", direction: "up", timestamp: Date.now() }, ]}
 };
 
 
@@ -51,9 +52,16 @@ export const move = (req, res) => {
         const direction = req.body.direction; // Mit Request aktuelle Ausrichtung anfragen
 
         if (direction === 'up') robot.position.y += 1;
-        else if (direction === 'down') robot.position.y -= 1;
+        else if (direction === 'down')  {   
+            // y-Achse soll nicht unter 0 gehen
+            if (robot.position.y > 0) robot.position.y -= 1;
+        }
         else if (direction === 'right') robot.position.x += 1;
-        else if (direction === 'left') robot.position.x -= 1;
+        else if (direction === 'left') 
+        {
+            // x-Achse soll nicht unter 0 gehen
+            if (robot.position.x > 0) robot.position.x -= 1;
+        } 
         else return res.status(400).send('Invalid direction');
 
         // Im Parameter Aktionen speichern, dass Roboter bewegt wurde
@@ -68,13 +76,20 @@ export const move = (req, res) => {
 
 export const pickUpItem = (req, res) => {
     const robot = robots[req.params.id];
-    const itemID = robots[req.params.itemID];
+    const itemID = req.params.itemID;
 
     if (robot)
-    {
-        robot.inventory.push(itemID);
-        robot.actions.push('Picked up Item $(itemID)');
-        res.json(robot);
+    { 
+        if (!robot.inventory.includes(itemID)) 
+        {
+            robot.inventory.push(itemID);
+            robot.actions.push(`Picked up Item ${itemID}`);
+            res.json(robot);
+        } 
+        else // Falls Item mit selber ID hinzugefuegt werden sollte
+        {
+            res.status(400).send('Item is already in inventory');
+        }
     }
     else
     {
@@ -84,57 +99,60 @@ export const pickUpItem = (req, res) => {
 
 export const putDownItem = (req, res) => {
     const robot = robots[req.params.id];
-    const itemID = robots[req.params.itemID];
+    const itemID = req.params.itemID;
 
-    if (robot)
-    {
-        const index = robot.inventory.indexOf(itemID);
-
-        // Wenn Item in der Item Liste existiert
-        if (index > -1)
-        {
-            robot.inventory.splice(index, 1); // Item aus der Liste entfernen
-            robot.actions.push('Put down item $(itemID)');
+    if (robot) {
+        if (robot.inventory.includes(itemID)) {
+            // Item ablegen, wenn es im Inventar ist
+            robot.inventory = robot.inventory.filter(item => item !== itemID);
+            robot.actions.push(`Put down item ${itemID}`);
             res.json(robot);
+        } else {
+            // Fehler, wenn das Item nicht im Inventar ist
+            res.status(400).send('Item not in inventory');
         }
-    }
-    else
-    {
+    } else {
         res.status(404).send('Robot not found');
     }
 };
+
 
 export const updateStatus = (req, res) => {
     const robot = robots[req.params.id];
 
-    if (robot)
-    {
-        // Ueberpruefen ob ein Energy-Wert vorhanden ist
-        // Wird auf undefined ueberprueft, da 0 auch ein valider Wert sein kann
-        if (req.body.energy !== undefined) 
-        {
-            robot.energy = req.body.energy; // Energielevel auf neuen Wert setzen
-            robot.actions.push('Updated energy to ${robot.energy}');
-        }
-
-        // Ueberprueft ob eine Position zurueckgegeben wurde
-        // Hier wird nur einmal geprueft ob ein Position Objekt vorhanden ist
-        if (req.body.position)
-        {
-            robot.position = req.body.position; // Aktualisiert die Position
-            robot.actions.push('Updated position to ${JSON.stringify(robot.position)}');
-        }
-
-        res.json(robot); // Neue Werte in JSON schreiben
-    }
-    else
+    if (!robot)
     {
         res.status(404).send('Robot not found');
     }
+
+    // Ueberpruefen ob ein Energy-Wert vorhanden ist
+    // Wird auf undefined ueberprueft, da 0 auch ein valider Wert sein kann
+    if (req.body.energy !== undefined) 
+    {
+        robot.energy = req.body.energy; // Energielevel auf neuen Wert setzen
+        robot.actions.push('Updated energy to ${robot.energy}');
+    }
+
+    // Ueberprueft ob eine Position zurueckgegeben wurde
+    // Hier wird nur einmal geprueft ob ein Position Objekt vorhanden ist
+    if (req.body.position)
+    {
+        robot.position = req.body.position; // Aktualisiert die Position
+        robot.actions.push('Updated position to ${JSON.stringify(robot.position)}');
+    }
+
+    res.json(robot); // Neue Werte in JSON schreiben
+
+
 };
 
 export const getActions = (req, res) => {
     const robot = robots[req.params.id];
+    if (!robot)
+    {
+        res.status(404).send('Robot not found');
+    }
+
     // Gewuenschte Seitenindex  vom Client
     const page = parseInt(req.query.page) || 1; 
     // Anzahl der Aktionen, falls kein Wert, wird es auf 5 gesetzt
@@ -145,11 +163,6 @@ export const getActions = (req, res) => {
     const endIndex = startIndex + size; 
     // Liste der Aktionen die aufgefuehrt werden sollen
     const paginatedActions = robot.actions.slice(startIndex, endIndex);
-
-    if (!robot)
-    {
-        res.status(404).send('Robot not found');
-    }
 
     res.json({
         actions: paginatedActions, // Auflistung
@@ -202,17 +215,3 @@ export const attackRobot = (req, res) => {
         res.status(404).send('Robot or Target not found');
     }
 };
-
-
-
-/* Funktionen als public definieren
-module.exports = 
-{
-    getStatus,
-    move,
-    pickUpItem,
-    putDownItem,
-    updateStatus,
-    getActions,
-    attackRobot
-}; */
