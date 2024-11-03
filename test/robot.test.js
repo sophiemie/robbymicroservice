@@ -165,7 +165,6 @@ describe('Robot API', () => {
         expect(newEnergyRobot1).toBe(initialEnergyRobot1 -10);
         expect(newEnergyRobot2).toBe(initialEnergyRobot2 -5);
     }); 
-    
         
 });
 
