@@ -31,7 +31,7 @@ const port = 4000; // Port festlegen
 // App.listen startet den Webserver
 // Erster Parameter gibt an an welcher Port gestartet werden soll
 // Zweiter Parameter ist eine Callback Funktion die aufgerufen wird, sobald der Server gestartet hat 
-app.listen(port, () => {
+app.listen(port,() => {
     console.log(`Server running on http://localhost:${port}`);
 });
 
