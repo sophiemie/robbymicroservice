@@ -26,12 +26,15 @@ app.use(express.json());
 // res = Response, schickt Antwort an den Client zurueck
 app.use('/robot', robotRoutes);
 
-const port = 4000; // Port festlegen
+// Da Cloud run automatisch auf 8080 laueft
+// Falls Cloud doch anderen Port verwendet soll dieser verwendet werden
+const port = process.env.PORT || 8080; // Port festlegen
 
 // App.listen startet den Webserver
 // Erster Parameter gibt an an welcher Port gestartet werden soll
-// Zweiter Parameter ist eine Callback Funktion die aufgerufen wird, sobald der Server gestartet hat 
-app.listen(port,() => {
+// Zweiter Parameter wurde ergaenzt um Server Verbindungen ausserhalb des Docker-Containers zu akzeptieren
+// () ist eine Callback Funktion die aufgerufen wird, sobald der Server gestartet hat 
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${port}`);
 });
 
